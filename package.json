@@ -61,8 +61,5 @@
     "./dist",
     "LICENSE.md",
     "README.md"
-  ],
-  "engines": {
-    "node": ">=22.18.0"
-  }
+  ]
 }

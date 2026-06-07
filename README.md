@@ -11,12 +11,19 @@ This plugin aims to solve that issue.
 
 When bundling is enabled, this plugin simply acts as a TsConfig Paths resolver.
 
-**TsConfig.json `baseUrl` is deprecated. This plugin only handles `rootDir`.**
+> One of the great strengths this plugin provides, is that you can easily set `"type": "module"` in your package.json without breaking the entire project.
+
+**tsconfig.json `baseUrl` is deprecated. This plugin only handles `rootDir`.**
+
+> This plugin uses itself to get compiled into JavaScript. How neat!
 
 ## Installation
 ```sh
 npm install --save-dev esbuild-fix-imports
 ```
+
+> The plugin has a minimal amount of dependencies, and only relies on [get-tsconfig](https://www.npmjs.com/package/get-tsconfig)
+> and, of course, [EsBuild](https://www.npmjs.com/package/esbuild).
 
 ## Usage
 ```ts
@@ -141,3 +148,8 @@ Optional custom resolver for what loader to use. Either pass a loader's name, or
         : 'ts'
 }
 ```
+
+## Disclaimer
+While it appears to correctly transform paths in most projects,
+there's no guarantee that this plugin will work flawlessly every time.
+It was made with intermediate Node.js + EsBuild knowdlege.
