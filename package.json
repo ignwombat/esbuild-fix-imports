@@ -1,0 +1,55 @@
+{
+  "type": "module",
+  "name": "esbuild-fix-imports",
+  "version": "1.0.0",
+  "description": "import/require transformer for EsBuild. Supports tsconfig paths.",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "node build.ts && tsc -p tsconfig.types.json",
+    "test": "tsx --test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ignwombat/esbuild-tsconfig-paths.git"
+  },
+  "keywords": [
+    "esbuild",
+    "tsconfig",
+    "typescript",
+    "esm",
+    "cjs"
+  ],
+  "author": "https://github.com/ignwombat",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ignwombat/esbuild-tsconfig-paths/issues"
+  },
+  "homepage": "https://github.com/ignwombat/esbuild-tsconfig-paths#readme",
+  "dependencies": {
+    "get-tsconfig": "^4.14.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.2",
+    "tsx": "^4.22.4",
+    "typescript": "^6.0.3"
+  },
+  "peerDependencies": {
+    "esbuild": "^0.28.0"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./*": {
+      "types": "./dist/*.d.ts",
+      "import": "./dist/*.js",
+      "require": "./dist/*.cjs"
+    }
+  },
+  "files": ["dist"],
+  "engines": {
+    "node": ">=22.18.0"
+  }
+}

@@ -1,0 +1,23 @@
+{
+    "compilerOptions": {
+        "target": "esnext",
+        "module": "esnext",
+        "moduleResolution": "bundler",
+
+        "lib": ["DOM", "DOM.Iterable", "ESNext"],
+        "esModuleInterop": true,
+        "strict": true,
+        "allowImportingTsExtensions": true,
+
+        "types": ["node"],
+
+        "rootDir": "./src",
+        "outDir": "./dist",
+
+        "declaration": true,
+        "emitDeclarationOnly": true
+    },
+
+    "include": ["src/**/*"],
+    "exclude": ["node_modules", "src/tests"]
+}
