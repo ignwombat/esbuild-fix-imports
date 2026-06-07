@@ -1,11 +1,18 @@
 import type { Loader } from 'esbuild';
 
 /**
+ * Type definition for Tsconfig Paths.
+*/
+export type TsConfigPaths = Record<string, Array<string>>;
+
+/**
  * Plugin options for the fix imports plugin.
 */
 export type FixImportsPluginOptions = Pick<
-    ImportOptions,
-    'inputFileExtension'|'outputFileExtension'
+    ImportFixOptions,
+    'inputExtension'|
+    'outputExtension'|
+    'ignoreDynamicImports'
 > & {
     /**
      * RegEx filter to detect input files. By default detects all TypeScript files.
@@ -20,21 +27,21 @@ export type FixImportsPluginOptions = Pick<
     filter?: RegExp;
 
     /**
-     * By default, this plugin will auto-import your project's tsconfig.
-     * If needed, you may pass either the paths or tsconfig location.
-     * Set to false to disable tsconfig paths resolution.
+     * By default, this plugin will auto-import your project's TsConfig.
+     * If needed, you may pass either the paths or TsConfig location.
+     * Set to false to disable TsConfig paths resolution.
      * @example
      * ```ts
-     * // tsconfig file location
+     * // TsConfig file location
      * {
-     *     tsconfigPaths: 'tsconfig.paths.json'
+     *     tsConfigPaths: 'tsconfig.paths.json'
      * }
      * ```
      * @example
      * ```ts
-     * // explicit tsconfig paths
+     * // Explicit TsConfig paths
      * {
-     *     tsconfigPaths: {
+     *     tsConfigPaths: {
      *         '@utils/*': ['./src/utils/*'],
      *         '@/*': ['./src/*']
      *     }
@@ -42,29 +49,29 @@ export type FixImportsPluginOptions = Pick<
      * ```
      * @example
      * ```ts
-     * // no tsconfig paths
+     * // No TsConfig paths
      * {
-     *     tsconfigPaths: false
+     *     tsConfigPaths: false
      * }
      * ```
     */
-    tsconfigPaths?: Record<string, Array<string>>|string|boolean;
+    tsConfigPaths?: TsConfigPaths|string|boolean;
 
     /**
-     * By default, this plugin will use the rootDir defined by the project's tsconfig
+     * By default, this plugin will use the rootDir defined by the project's TsConfig
      * (or the current working directory.)
      * If needed, you may pass a separate rootDir location.
      * Set to false to always use the current working directory.
      * @example
      * ```ts
-     * // set rootDir to src/app
+     * // Set rootDir to src/app
      * {
      *     rootDir: './src/app'
      * }
      * ```
      * @example
      * ```ts
-     * // force rootDir to the current working directory
+     * // Force rootDir to the current working directory
      * {
      *     rootDir: false
      * }
@@ -98,7 +105,7 @@ export type FixImportsPluginOptions = Pick<
 /**
  * Options for fixing imports and requires in a single file.
 */
-export interface ImportOptions {
+export interface ImportFixOptions {
     /**
      * Path of the source file.
     */
@@ -127,34 +134,61 @@ export interface ImportOptions {
      * @example
      * ```ts
      * {
-     *     tsconfigPaths: {
+     *     tsConfigPaths: {
      *         '@utils/*': ['src/utils/*'],
      *         '@/*': ['src/*']
      *     }
      * }
      * ```
     */
-    tsconfigPaths?: Record<string, Array<string>>;
+    tsConfigPaths?: TsConfigPaths;
 
     /**
-     * File extension to check during imports. Defaults to the same extension as the input file.
+     * File extension to use when searching for the import file. Defaults to the same extension as the input file.
+     * @example
+     * ```ts
+     * // Use .ts when searching for files
+     * {
+     *     inputExtension: '.ts'
+     * }
+     * ```
     */
-    inputFileExtension?: string|Record<string, string>;
+    inputExtension?: string|Record<string, string>;
 
     /**
      * File extension to use in the output import. Defaults to the same extension as the input file.
+     * @example
+     * ```ts
+     * // Use .js in the output import
+     * {
+     *     outputExtension: '.js'
+     * }
+     * ```
     */
-    outputFileExtension?: string|Record<string, string>;
+    outputExtension?: string|Record<string, string>;
 
     /**
-     * Optional cache to use when resolving imports from tsconfig paths.
+     * Some projects rely on dynamic ESM imports being untouched.
+     * Set this to true to ignore dynamic imports.
+     * @example
+     * ```ts
+     * // Leave dynamic imports untouched
+     * {
+     *     ignoreDynamicImports: true
+     * }
+     * ```
+    */
+    ignoreDynamicImports?: boolean;
+
+    /**
+     * Optional cache to use when resolving imports from TsConfig paths.
      * Ideally pass an empty map here, as the function will add to it.
     */
     pathCache?: Map<string, string>
 }
 
 /**
- * Results of the applied fix
+ * Result of the applied import fix.
 */
 export interface ImportFixResult {
     /**
@@ -217,3 +251,56 @@ export type LoaderResolver = (
     */
     filePath: string
 ) => Loader;
+
+/**
+ * Options for resolving an import from a file.
+*/
+export type ResolveImportPathOptions = Pick<
+    ImportFixOptions,
+    'filePath'|
+    'pathCache'|
+    'inputExtension'|
+    'outputExtension'|
+    'rootDir'
+> & {
+    /**
+     * Import Path the source file is targeting.
+    */
+    importPath: string;
+    
+    /**
+     * Optional explicit TsConfig Paths.
+    */
+    tsConfigPaths?: TsConfigPaths;
+}
+
+/**
+ * Result of the resolved import.
+*/
+export type ResolveImportPathResult = Required<Pick<
+    ResolveImportPathOptions,
+    'inputExtension'|
+    'outputExtension'
+>> & Pick<
+    ResolveImportPathOptions,
+    'pathCache'
+> & {
+    /**
+     * Resolved path to the actual file. Includes file extension.
+     * 
+     * **Will return the original path if not resolved.**
+    */
+    resolvedInput: string;
+
+    /**
+     * Resolved import path to write to the output. Includes file extension.
+     * 
+     * **Will return the original import path if not resolved.**
+    */
+    resolvedOutput: string;
+
+    /**
+     * True if the original import was a folder, and an index file was found.
+    */
+    isIndexFile: boolean;
+}

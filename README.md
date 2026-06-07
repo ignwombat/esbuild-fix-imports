@@ -1,14 +1,17 @@
 # EsBuild Fix Imports
-import/require transformer for esbuild. Supports tsconfig paths.
+import/require transformer for esbuild. Supports TsConfig Paths.
+
 Not to be confused with [EsBuild Fix Imports Plugin](https://github.com/aymericzip/esbuild-fix-imports-plugin).
-These plugins differ in that this one properly walks through the code and only modifies import strings.
+These plugins differ in that this one walks through the code and only modifies import/export strings, instead of relying purely on RegEx patterns.
 If the other plugin works in your use case, there is no need to install this one.
 
-> While EsBuild can perfectly *resolve* your files, when bundling is disabled, it won't automatically change the import paths,
-which can cause problems when you want to compile your project to both ESM and CommonJS.
+> While EsBuild can *resolve* your files, when bundling is disabled, it won't automatically change the import paths,
+which can cause problems when you want to compile your project to both ESM and CommonJS, or use simpler imports in ESM.
 This plugin aims to solve that issue.
 
-**Tsconfig.json `baseUrl` is deprecated. This plugin only handles `rootDir`.**
+When bundling is enabled, this plugin simply acts as a TsConfig Paths resolver.
+
+**TsConfig.json `baseUrl` is deprecated. This plugin only handles `rootDir`.**
 
 ## Installation
 ```sh
@@ -20,18 +23,60 @@ npm install --save-dev esbuild-fix-imports
 import { build } from 'esbuild';
 import { FixImportsPlugin } from 'esbuild-fix-imports';
 
+// Can build to either ESM or CJS without modifying the source
 build({
+    // ...
+    bundle: false,
     plugins: [
         // ...
         FixImportsPlugin({
-            // ...
+            outputExtension: '.js'
         })
+    ]
+});
+
+// With bundle: true, the plugin will simply resolve TsConfig Paths
+// Most options are not used by the plugin in this mode
+build({
+    // ...
+    bundle: true,
+    plugins: [
+        // ...
+        FixImportsPlugin()
     ]
 })
 ```
 
 ## Options
-**All options are optional**
+**All options are optional.**
+
+### `inputExtension` (string)
+File extension to use when searching for the import file. Defaults to the same extension as the input file.
+```ts
+// Use .ts when searching for files
+{
+    inputExtension: '.ts'
+}
+```
+
+### `outputExtension` (string)
+File extension to use in the output import. Defaults to the same extension as the input file.
+```ts
+// Use .js in the output import
+{
+    outputExtension: '.js'
+}
+```
+
+### `ignoreDynamicImports` (boolean)
+Some projects rely on dynamic ESM imports being untouched.
+Set this to true to ignore dynamic imports.
+```ts
+// Leave dynamic imports untouched
+{
+    ignoreDynamicImports: true
+}
+```
 
 ### `filter` (RegExp)
 RegEx filter to detect input files. By default detects all TypeScript files.

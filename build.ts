@@ -1,7 +1,19 @@
-import { join } from 'node:path';
-import { rmSync, globSync } from 'node:fs';
+// Path
+import {
+    basename,
+    dirname,
+    extname,
+    join
+} from 'node:path';
 
+// FS
+import { rmSync, globSync } from 'node:fs';
+import { mkdir, writeFile } from 'node:fs/promises';
+
+// External
 import { build, type BuildOptions } from 'esbuild';
+
+// Local
 import { FixImportsPlugin } from './src/index.ts';
 
 rmSync(
@@ -10,7 +22,10 @@ rmSync(
 );
 
 const entryPoints = globSync('src/**/*', {
-    exclude: ['src/tests']
+    exclude: [
+        'src/tests',
+        'src/types.ts'
+    ]
 });
 
 const esmOptions: BuildOptions = {
@@ -19,8 +34,8 @@ const esmOptions: BuildOptions = {
 
     format: 'esm',
     platform: 'node',
-    minify: false,
-    treeShaking: false,
+    minify: true,
+    treeShaking: true,
     sourcemap: true
 };
 
@@ -29,8 +44,8 @@ build({
     ...esmOptions,
     plugins: [FixImportsPlugin({
         filter: /\.ts$/,
-        inputFileExtension: '.ts',
-        outputFileExtension: '.js',
+        inputExtension: '.ts',
+        outputExtension: '.js',
         loader: 'ts'
     })]
 }).catch(() => process.exit(1));
@@ -39,11 +54,35 @@ build({
 build({
     ...esmOptions,
     format: 'cjs',
+    sourcemap: false,
+    write: false,
     outExtension: { '.js': '.cjs' },
     plugins: [FixImportsPlugin({
         filter: /\.ts$/,
-        inputFileExtension: '.ts',
-        outputFileExtension: '.cjs',
+        inputExtension: '.ts',
+        outputExtension: '.cjs',
         loader: 'ts'
     })]
-}).catch(() => process.exit(1));
+})
+    .then(async result => result.outputFiles?.map(async file => {
+        const contents = Buffer.from(file.contents)
+            .toString('utf8');
+        
+        await mkdir(
+            dirname(file.path),
+            { recursive: true }
+        );
+
+        const ext = extname(file.path);
+        const name = basename(file.path).slice(0, -ext.length);
+        const footer = `//# sourceMappingURL=${name}.js.map`; 
+
+        await writeFile(
+            file.path,
+            /\n\r?$/.test(contents)
+                ? contents + footer + '\n'
+                : contents + '\n' + footer + '\n',
+            'utf8'
+        );
+    }))
+    .catch(() => process.exit(1));

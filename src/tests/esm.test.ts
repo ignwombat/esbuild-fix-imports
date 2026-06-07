@@ -1,13 +1,14 @@
 import test from 'node:test';
 import { match } from 'node:assert/strict';
 
-import fixImportsAndRequires from '../fixImports';
+import fixImportsAndRequires from '../fixImports.ts';
+import tsConfigPaths from './tsconfig.paths.ts';
 
 const contents =
 `import add from '@sub/add';
 add(1, 2)`;
 
-test('ESM import', async () => {
+test("ESM import", async () => {
     const result = await fixImportsAndRequires({
         filePath: import.meta.filename,
         rootDir: import.meta.dirname,
@@ -15,12 +16,10 @@ test('ESM import', async () => {
         contents,
         writeToFile: false,
 
-        inputFileExtension: '.ts',
-        outputFileExtension: '.js',
+        inputExtension: '.ts',
+        outputExtension: '.js',
 
-        tsconfigPaths: {
-            '@sub/*': ['./sub/*']
-        }
+        tsConfigPaths
     });
 
     match(

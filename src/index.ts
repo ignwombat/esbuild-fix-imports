@@ -1,20 +1,28 @@
+// Path
+import { extname } from 'node:path';
+
+// Types
 import type { Plugin } from 'esbuild';
 import type {
     FixImportsPluginOptions,
-    LoaderResolver
+    LoaderResolver,
+    TsConfigPaths
 } from './types.ts';
 
-import fixImportsAndRequires from './fixImports.ts';
-import { defaultFilter } from './const.ts';
-import { extname } from 'node:path';
+// External
 import { getTsconfig, type TsConfigJson } from 'get-tsconfig';
+
+// Local
+import { defaultFilter } from './const.ts';
+import fixImportsAndRequires from './fixImports.ts';
+import resolveImportPath, { enablePathResolver } from './resolveImportPath.ts';
 
 /**
  * EsBuild plugin which fixes issues related to import/require differences between ESM/CJS.
 */
-export const FixImportsPlugin: (
-    options?: FixImportsPluginOptions
-) => Plugin = (options = {}) => {
+export function FixImportsPlugin (
+    options: FixImportsPluginOptions = {}
+): Plugin {
     /**
      * EsBuild plugin which fixes issues related to import/require differences between ESM/CJS.
     */
@@ -22,13 +30,13 @@ export const FixImportsPlugin: (
         name: 'esbuild-fix-imports',
         setup(build) {
             let rootDir: string|undefined;
-            let tsconfigPaths: Record<string, Array<string>>|undefined;
+            let tsConfigPaths: TsConfigPaths|undefined;
 
             let tsconfig: TsConfigJson|undefined;
 
             if (
                 options.rootDir !== false &&
-                options.tsconfigPaths !== false
+                options.tsConfigPaths !== false
             ) {
                 tsconfig = getTsconfig()?.config;
             }
@@ -39,16 +47,16 @@ export const FixImportsPlugin: (
                     : tsconfig?.compilerOptions?.rootDir;
             }
 
-            if (options.tsconfigPaths !== false) {
-                if (typeof options.tsconfigPaths === 'object')
-                    tsconfigPaths = options.tsconfigPaths
+            if (options.tsConfigPaths !== false) {
+                if (typeof options.tsConfigPaths === 'object')
+                    tsConfigPaths = options.tsConfigPaths
                 else {
-                    const pathConfig = typeof options.tsconfigPaths === 'string'
-                        ? getTsconfig(options.tsconfigPaths)?.config
+                    const pathConfig = typeof options.tsConfigPaths === 'string'
+                        ? getTsconfig(options.tsConfigPaths)?.config
                         : tsconfig;
 
                     if (pathConfig)
-                        tsconfigPaths = pathConfig.compilerOptions?.paths;
+                        tsConfigPaths = pathConfig.compilerOptions?.paths;
                 }
             }
 
@@ -71,15 +79,28 @@ export const FixImportsPlugin: (
                                         : 'text'
                     );
 
+            // If bundling is enabled, all this plugin will do is resolve the import from tsconfig paths
+            if (build.initialOptions.bundle)
+                return enablePathResolver(
+                    build,
+                    {
+                        ...options,
+                        tsConfigPaths: tsConfigPaths!,
+                        rootDir: rootDir ?? process.cwd()
+                    },
+                    pathCache
+                );
+
             build.onLoad(
                 { filter: options.filter ?? defaultFilter },
                 async args => {
                     const result = await fixImportsAndRequires({
                         filePath: args.path,
                         writeToFile: false,
-                        inputFileExtension: options.inputFileExtension,
-                        outputFileExtension: options.outputFileExtension,
-                        tsconfigPaths,
+                        inputExtension: options.inputExtension,
+                        outputExtension: options.outputExtension,
+                        ignoreDynamicImports: options.ignoreDynamicImports,
+                        tsConfigPaths,
                         rootDir,
                         pathCache
                     });
@@ -97,4 +118,10 @@ export const FixImportsPlugin: (
     };
 
     return plugin;
+};
+
+// Other exports for consumer convenience
+export {
+    fixImportsAndRequires,
+    resolveImportPath
 };
