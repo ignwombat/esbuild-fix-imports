@@ -1,5 +1,8 @@
 # EsBuild Fix Imports
 import/require transformer for esbuild. Supports tsconfig paths.
+Not to be confused with [EsBuild Fix Imports Plugin](https://github.com/aymericzip/esbuild-fix-imports-plugin).
+These plugins differ in that this one properly walks through the code and only modifies import strings.
+If the other plugin works in your use case, there is no need to install this one.
 
 > While EsBuild can perfectly *resolve* your files, when bundling is disabled, it won't automatically change the import paths,
 which can cause problems when you want to compile your project to both ESM and CommonJS.

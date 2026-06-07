@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ignwombat/esbuild-tsconfig-paths.git"
+    "url": "git+https://github.com/ignwombat/esbuild-fix-imports.git"
   },
   "keywords": [
     "esbuild",
@@ -19,12 +19,12 @@
     "esm",
     "cjs"
   ],
-  "author": "https://github.com/ignwombat",
+  "author": "IgnWombat <ignwombat@gmail.com> (https://github.com/ignwombat)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ignwombat/esbuild-tsconfig-paths/issues"
+    "url": "https://github.com/ignwombat/esbuild-fix-imports/issues"
   },
-  "homepage": "https://github.com/ignwombat/esbuild-tsconfig-paths#readme",
+  "homepage": "https://github.com/ignwombat/esbuild-fix-imports#readme",
   "dependencies": {
     "get-tsconfig": "^4.14.0"
   },
@@ -48,7 +48,7 @@
       "require": "./dist/*.cjs"
     }
   },
-  "files": ["dist"],
+  "files": ["./dist", "./package.json"],
   "engines": {
     "node": ">=22.18.0"
   }
