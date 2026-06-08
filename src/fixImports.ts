@@ -5,7 +5,7 @@ import { extname } from 'node:path';
 import { readFile, writeFile } from 'node:fs/promises';
 
 // Types
-import type { ImportFixOptions, ImportFixResult } from './types.ts';
+import type { FixImportOptions, FixImportResult } from './types.ts';
 
 // Local
 import { dynamicImportRegex, importRegex, requireRegex } from './const.ts';
@@ -19,8 +19,8 @@ import resolveImportPath from './resolveImportPath.ts';
  * @param options Options for fixing imports in a single file.
  */
 export default async function fixImportsAndRequires(
-    options: ImportFixOptions
-): Promise<ImportFixResult> {
+    options: FixImportOptions
+): Promise<FixImportResult> {
     // Paths
     const filePath = options.filePath;
 
@@ -99,7 +99,7 @@ export default async function fixImportsAndRequires(
 
     const newContents = mappedChunks.join('');
 
-    const result: ImportFixResult = {
+    const result: FixImportResult = {
         newContents,
         oldContents: fileContents,
         filePath,

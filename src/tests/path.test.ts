@@ -19,6 +19,6 @@ test("Path Resolution", async () => {
     equal(
         result.resolvedOutput,
         './sub/add.js',
-        "File wasn't properly resolved"
+        "File wasn't properly resolved."
     )
 });

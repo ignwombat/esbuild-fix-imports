@@ -9,7 +9,7 @@ export type TsConfigPaths = Record<string, Array<string>>;
  * Plugin options for the fix imports plugin.
 */
 export type FixImportsPluginOptions = Pick<
-    ImportFixOptions,
+    FixImportOptions,
     'inputExtension'|
     'outputExtension'|
     'ignoreDynamicImports'
@@ -105,7 +105,7 @@ export type FixImportsPluginOptions = Pick<
 /**
  * Options for fixing imports and requires in a single file.
 */
-export interface ImportFixOptions {
+export interface FixImportOptions {
     /**
      * Path of the source file.
     */
@@ -190,7 +190,7 @@ export interface ImportFixOptions {
 /**
  * Result of the applied import fix.
 */
-export interface ImportFixResult {
+export interface FixImportResult {
     /**
      * New file contents.
     */
@@ -256,7 +256,7 @@ export type LoaderResolver = (
  * Options for resolving an import from a file.
 */
 export type ResolveImportPathOptions = Pick<
-    ImportFixOptions,
+    FixImportOptions,
     'filePath'|
     'pathCache'|
     'inputExtension'|

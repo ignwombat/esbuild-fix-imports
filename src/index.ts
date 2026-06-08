@@ -5,6 +5,11 @@ import { extname } from 'node:path';
 import type { Plugin } from 'esbuild';
 import type {
     FixImportsPluginOptions,
+    FixImportOptions,
+    FixImportResult,
+    ResolveImportPathOptions,
+    ResolveImportPathResult,
+    JsChunk,
     LoaderResolver,
     TsConfigPaths
 } from './types.ts';
@@ -123,5 +128,17 @@ export function FixImportsPlugin (
 // Other exports for consumer convenience
 export {
     fixImportsAndRequires,
-    resolveImportPath
+    resolveImportPath,
 };
+
+// Types
+export type {
+    FixImportsPluginOptions,
+    FixImportOptions,
+    FixImportResult,
+    ResolveImportPathOptions,
+    ResolveImportPathResult,
+    JsChunk,
+    LoaderResolver,
+    TsConfigPaths
+}

@@ -1,5 +1,5 @@
 import test from 'node:test';
-import { match } from 'node:assert/strict';
+import { equal } from 'node:assert/strict';
 
 import fixImportsAndRequires from '../fixImports.ts';
 import tsConfigPaths from './tsconfig.paths.ts';
@@ -8,7 +8,7 @@ const contents =
 `import add from '@sub/add';
 add(1, 2)`;
 
-test("ESM import", async () => {
+test("ESM Import", async () => {
     const result = await fixImportsAndRequires({
         filePath: import.meta.filename,
         rootDir: import.meta.dirname,
@@ -22,9 +22,9 @@ test("ESM import", async () => {
         tsConfigPaths
     });
 
-    match(
-        result.newContents,
-        /^import\s+add\s+from\s+'.\/sub\/add.js';/,
-        "File wasn't properly resolved"
+    equal(
+        result.newContents.split('\n')[0],
+        "import add from './sub/add.js';",
+        "File wasn't properly resolved."
     );
 });

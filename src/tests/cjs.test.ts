@@ -1,5 +1,5 @@
 import test from 'node:test';
-import { match } from 'node:assert/strict';
+import { equal } from 'node:assert/strict';
 
 import fixImportsAndRequires from '../fixImports.ts';
 import tsConfigPaths from './tsconfig.paths.ts';
@@ -8,7 +8,7 @@ const contents =
 `const add = require('@sub/add');
 add(1, 2)`;
 
-test("CJS import", async () => {
+test("CJS Import", async () => {
     const result = await fixImportsAndRequires({
         filePath: import.meta.filename,
         rootDir: import.meta.dirname,
@@ -22,9 +22,9 @@ test("CJS import", async () => {
         tsConfigPaths
     });
 
-    match(
-        result.newContents,
-        /^const\s+add\s*=\s*require\(\s*'.\/sub\/add.js'\s*\);/,
-        "File wasn't properly resolved"
+    equal(
+        result.newContents.split('\n')[0],
+        "const add = require('./sub/add.js');",
+        "File wasn't properly resolved."
     );
 });
