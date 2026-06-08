@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "esbuild-fix-imports",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "import/require transformer for EsBuild. Supports TsConfig Paths.",
   "main": "dist/index.js",
   "scripts": {
