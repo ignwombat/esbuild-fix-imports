@@ -67,11 +67,11 @@ File extension to use when searching for the import file. Defaults to the same e
 ```
 
 ### `outputExtension` (string)
-File extension to use in the output import. Defaults to the same extension as the input file.
+File extension to use in the output import. Defaults to `'.js'`.
 ```ts
-// Use .js in the output import
+// Use .cjs in the output import
 {
-    outputExtension: '.js'
+    outputExtension: '.cjs'
 }
 ```
 
