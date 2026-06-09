@@ -8,7 +8,7 @@ import {
 } from 'node:path';
 
 // Fs
-import { stat } from 'node:fs/promises';
+import { existsSync, statSync } from 'node:fs';
 
 // Validation
 import { equal, ok } from 'node:assert/strict';
@@ -28,8 +28,11 @@ import { relativePathRegex } from './const.ts';
 /**
  * Simple stat wrapper with catch to undefined.
 */
-const safeStat = (path: string) => stat(path)
-    .catch(() => undefined);
+const safeStat = (path: string) => {
+    try {
+        return statSync(path);
+    } catch {}
+};
 
 /**
  * Cleanup relative path.
@@ -43,9 +46,9 @@ const cleanRelPath = (path: string) => (
 /**
  * Resolves the import path for a file. Includes file extension.
 */
-export default async function resolveImportPath(
+export default function resolveImportPath(
     options: ResolveImportPathOptions
-): Promise<ResolveImportPathResult> {
+): ResolveImportPathResult {
     // Validation
     equal(typeof options.filePath, 'string', "filePath must be a string");
     equal(typeof options.importPath, 'string', "importPath must be a string");
@@ -108,12 +111,11 @@ export default async function resolveImportPath(
                     const tryImportPath = path.replace(/\/\*$/, '/' + rest);
                     const joinedPath = resolve(rootDir, tryImportPath);
 
-                    const firstStat = await safeStat(joinedPath);
-                    if (firstStat) {
+                    if (existsSync(joinedPath)) {
                         resolved = joinedPath;
                         break;
                     } else {
-                        const secondStat = await safeStat(joinedPath + inputExt);
+                        const secondStat = safeStat(joinedPath + inputExt);
                         if (secondStat?.isFile()) {
                             resolved = joinedPath + inputExt;
                             break;
@@ -132,7 +134,7 @@ export default async function resolveImportPath(
     // Default to relative import
     const resultingPath = resolvedFilePath ?? join(filePath, '..', importPath);
     const resultingExt = extname(resultingPath);
-    const cleanImportStat = await safeStat(resultingPath);
+    const cleanImportStat = safeStat(resultingPath);
 
     const result: ResolveImportPathResult = {
         inputExtension: inputExt,
@@ -162,7 +164,7 @@ export default async function resolveImportPath(
             }
 
             const indexFile = join(resultingPath, 'index' + inputExt);
-            if (await safeStat(indexFile)) {
+            if (existsSync(indexFile)) {
                 const joined = join(resultingPath, 'index' + outputExt);
                 const rel = cleanRelPath(relative(
                     parentDir,
@@ -179,7 +181,7 @@ export default async function resolveImportPath(
         }
 
         // File import without extension
-        case (await safeStat(resultingPath + inputExt)) !== undefined: {
+        case existsSync(resultingPath + inputExt): {
             const rel = cleanRelPath(
                 relative(parentDir, resultingPath) +
                 outputExt
