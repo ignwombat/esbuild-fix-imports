@@ -31,7 +31,7 @@ export default async function fixImportsAndRequires(
     // File extension
     const fileExt = extname(filePath);
     const inputExt = options.inputExtension ?? fileExt;
-    const outputExt = options.outputExtension ?? fileExt;
+    const outputExt = options.outputExtension ?? '.js';
 
     // File contents (cast to string to prevent TypeScript errors)
     let fileContents = options.contents as string;

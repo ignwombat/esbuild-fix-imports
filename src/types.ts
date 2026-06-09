@@ -156,12 +156,12 @@ export interface FixImportOptions {
     inputExtension?: string|Record<string, string>;
 
     /**
-     * File extension to use in the output import. Defaults to the same extension as the input file.
+     * File extension to use in the output import. Defaults to '.js'.
      * @example
      * ```ts
-     * // Use .js in the output import
+     * // Use .cjs in the output import
      * {
-     *     outputExtension: '.js'
+     *     outputExtension: '.cjs'
      * }
      * ```
     */
