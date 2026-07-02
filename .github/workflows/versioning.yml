@@ -31,4 +31,4 @@ jobs:
         run: npm ci
 
       - name: Create release pull request
-        uses: changesets/actions@v2
+        uses: changesets/action@v2
