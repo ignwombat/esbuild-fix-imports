@@ -6,6 +6,7 @@ import tsConfigPaths from './tsconfig.paths.ts';
 
 const contents =
 `const add = require('@sub/add');
+const randomTemplateString = \`Hello World \${1+1}\`;
 add(1, 2)`;
 
 test("CJS Import", async () => {

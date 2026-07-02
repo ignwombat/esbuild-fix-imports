@@ -213,18 +213,41 @@ export interface FixImportResult {
 }
 
 /**
+ * Kind of JsChunk.
+*/
+type JsChunkKind =
+    | 'code'
+    | 'string'
+    | 'template'
+    | 'templateExpression'
+    | 'templateExpressionStart'
+    | 'templateExpressionEnd'
+
+/**
  * Chunks used to distinguish strings from logic.
 */
 export interface JsChunk {
     /**
-     * Set to the opening/closing quote if the chunk is a string expression
+     * Raw content of the chunk
+    */
+    content: string;
+
+    /**
+     * Kind of chunk.
+    */
+    kind: JsChunkKind;
+
+    /**
+     * If kind === 'string', matches the opening/closing quote.
+     * If kind === 'template', always '`'
     */
     stringQuote: string|null;
 
     /**
-     * Content of the chunk
+     * For templateExpression chunks.
+     * True if expression is inside a template string.
     */
-    content: string;
+    inTemplate?: boolean;
 
     /**
      * Previous chunk
