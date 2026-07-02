@@ -18,6 +18,7 @@ import type {
 import { getTsconfig, type TsConfigJson } from 'get-tsconfig';
 
 // Local
+import chunkFileContents from './chunk.ts';
 import { defaultFilter } from './const.ts';
 import fixImportsAndRequires from './fixImports.ts';
 import resolveImportPath, { enablePathResolver } from './resolveImportPath.ts';
@@ -127,6 +128,7 @@ export function FixImportsPlugin (
 
 // Other exports for consumer convenience
 export {
+    chunkFileContents,
     fixImportsAndRequires,
     resolveImportPath,
 };
@@ -141,4 +143,4 @@ export type {
     JsChunk,
     LoaderResolver,
     TsConfigPaths
-}
+};
