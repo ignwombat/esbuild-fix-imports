@@ -38,6 +38,6 @@ jobs:
 
       - name: Create tag
         run: |
-          VERSION=$(node -p "require(''./package.json').version")
+          VERSION=$(node -p "require('./package.json').version")
           git tag v$VERSION
           git push origin v$VERSION
