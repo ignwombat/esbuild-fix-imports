@@ -7,7 +7,7 @@ import {
 } from 'node:path';
 
 // FS
-import { rmSync, globSync } from 'node:fs';
+import { existsSync, globSync, rmSync } from 'node:fs';
 import { mkdir, writeFile } from 'node:fs/promises';
 
 // External
@@ -16,10 +16,8 @@ import { build, type BuildOptions } from 'esbuild';
 // Local
 import { FixImportsPlugin } from './src/index.ts';
 
-rmSync(
-    join(process.cwd(), 'dist'),
-    { recursive: true }
-);
+const distPath = join(process.cwd(), 'dist');
+existsSync(distPath) && rmSync(distPath, { recursive: true });
 
 const entryPoints = globSync('src/**/*', {
     exclude: [
