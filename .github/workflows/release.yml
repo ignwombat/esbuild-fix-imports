@@ -7,15 +7,15 @@ on:
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
-permissions:
-  id-token: write
-  contents: write
-  pull-requests: write
-
 jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: write
+      pull-requests: write
 
     steps:
       - name: Checkout repository
@@ -39,4 +39,4 @@ jobs:
         if: steps.changesets.outputs.hasChangesets == 'false'
         run: |
           npm test
-          npm publish
+          npx publish
