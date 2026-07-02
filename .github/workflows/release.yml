@@ -35,4 +35,4 @@ jobs:
         id: changesets
         uses: changesets/action@v1
         with:
-          publish: npm run test && npm run build && changeset publish
+          publish: npm run release
