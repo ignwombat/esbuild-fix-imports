@@ -39,4 +39,4 @@ jobs:
         if: steps.changesets.outputs.hasChangesets == 'false'
         run: |
           npm test
-          npx publish
+          npm publish
