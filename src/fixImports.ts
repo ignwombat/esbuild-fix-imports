@@ -80,7 +80,7 @@ export default async function fixImportsAndRequires(
 
                 const importPath = chunk.content.slice(quoteLen, -quoteLen);
 
-                const result = await resolveImportPath({
+                const result = resolveImportPath({
                     filePath,
                     importPath,
                     inputExtension: inputExt,
