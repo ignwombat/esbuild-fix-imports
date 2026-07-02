@@ -48,7 +48,7 @@ build({
     })]
 }).catch(() => process.exit(1));
 
-// CJS
+// CJS (must rewrite source mappings)
 build({
     ...esmOptions,
     format: 'cjs',
