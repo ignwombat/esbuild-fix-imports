@@ -37,6 +37,6 @@ jobs:
 
       - name: Test and Publish to npm
         if: steps.changesets.outputs.hasChangesets == 'false'
-        run: npm test && npm publish
-        env:
-          NPM_CONFIG_PROVENANCE: true
+        run: |
+          npm test
+          npm publish --provenance
