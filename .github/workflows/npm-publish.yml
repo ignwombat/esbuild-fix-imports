@@ -16,6 +16,7 @@ permissions:
 
 jobs:
   build:
+    name: Build project
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -30,6 +31,7 @@ jobs:
         run: npm test
 
   publish-npm:
+    name: Publish to NPM
     needs: build
     runs-on: ubuntu-latest
     steps:
