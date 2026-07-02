@@ -1,4 +1,4 @@
-name: Version Package
+name: Release
 
 on:
   push:
@@ -10,10 +10,11 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 permissions:
   contents: write
   pull-requests: write
+  id-token: write
 
 jobs:
-  version:
-    name: Version Package
+  release:
+    name: Release
     runs-on: ubuntu-latest
 
     steps:
@@ -32,3 +33,7 @@ jobs:
 
       - name: Create release pull request
         uses: changesets/action@v1
+      
+      - name: Publish
+        if: steps.changesets.outputs.hasChangesets == 'false'
+        run: npm publish
