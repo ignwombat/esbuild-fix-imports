@@ -31,7 +31,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Create release pull request
+      - name: Create release pull request or publish to npm
+        id: changesets
         uses: changesets/action@v1
-        with:
-          publish-script: npm publish
+
+      - name: Publish to npm
+        if: steps.changesets.outputs.hasChangesets == 'false'
+        run: npm publish
