@@ -1,5 +1,11 @@
 # esbuild-fix-imports
 
+## 1.0.6
+
+### Patch Changes
+
+- 847c400: dist is missing
+
 ## 1.0.5
 
 ### Patch Changes
