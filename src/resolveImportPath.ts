@@ -35,6 +35,23 @@ const safeStat = (path: string) => {
 };
 
 /**
+ * Returns the first file extension that resolves to an existing file.
+*/
+const firstValidExt = (
+    path: string,
+    extensions: string|Array<string>
+) => {
+    if (typeof extensions === 'string')
+        extensions = [extensions];
+
+    for (let i = 0; i < extensions.length; i++) {
+        const ext = extensions[i];
+        if (safeStat(path + ext)?.isFile())
+            return ext;
+    }
+}
+
+/**
  * Cleanup relative path.
 */
 const cleanRelPath = (path: string) => (
@@ -56,7 +73,12 @@ export default function resolveImportPath(
     options.tsConfigPaths !== undefined && equal(typeof options.tsConfigPaths, 'object', "tsConfigPaths must be an Object");
     options.rootDir !== undefined && equal(typeof options.rootDir, 'string', "rootDir must be a string");
     
-    options.inputExtension !== undefined && equal(typeof options.inputExtension, 'string', "inputExtension must be a string");
+    options.inputExtension !== undefined && ok(
+        typeof options.inputExtension === 'string' ||
+        typeof options.inputExtension === 'object',
+        "inputExtension must be a string, an Object or an Array"
+    );
+
     options.outputExtension !== undefined && equal(typeof options.outputExtension, 'string', "outputExtension must be a string");
     options.pathCache !== undefined && ok(options.pathCache instanceof Map, "pathCache must be a map");
 
@@ -68,9 +90,29 @@ export default function resolveImportPath(
 
     const rootDir = options.rootDir ?? process.cwd();
 
+    // File extensions
     const importerExt = extname(filePath);
-    const inputExt = options.inputExtension ?? importerExt;
-    const outputExt = options.outputExtension ?? importerExt;
+
+    let inputExtensions: Array<string>;
+    if (typeof options.inputExtension === 'object') {
+        if (options.inputExtension instanceof Array)
+            inputExtensions = [...options.inputExtension];
+        else {
+            const indexed = options.inputExtension[importerExt] ?? importerExt;
+            inputExtensions = indexed instanceof Array
+                ? [...indexed]
+                : [indexed];
+        }
+    } else inputExtensions = [importerExt];
+
+    // Add TSX/JSX
+    if (inputExtensions.includes('.ts') && !inputExtensions.includes('.tsx'))
+        inputExtensions.push('.tsx');
+
+    if (inputExtensions.includes('.js') && !inputExtensions.includes('.jsx'))
+        inputExtensions.push('.jsx');
+
+    const outputExt = options.outputExtension ?? '.js';
 
     // Absolute path of the resolved file
     // Cache is only appended to for non-relative imports
@@ -115,9 +157,9 @@ export default function resolveImportPath(
                         resolved = joinedPath;
                         break;
                     } else {
-                        const secondStat = safeStat(joinedPath + inputExt);
-                        if (secondStat?.isFile()) {
-                            resolved = joinedPath + inputExt;
+                        const validExt = firstValidExt(joinedPath, inputExtensions);
+                        if (validExt !== undefined) {
+                            resolved = joinedPath + validExt;
                             break;
                         }
                     }
@@ -137,7 +179,9 @@ export default function resolveImportPath(
     const cleanImportStat = safeStat(resultingPath);
 
     const result: ResolveImportPathResult = {
-        inputExtension: inputExt,
+        inputExtension: resolvedFilePath
+            ? resultingExt
+            : importerExt,
         outputExtension: outputExt,
         isIndexFile: false,
         resolvedInput: resultingPath,
@@ -163,8 +207,9 @@ export default function resolveImportPath(
                 break;
             }
 
-            const indexFile = join(resultingPath, 'index' + inputExt);
-            if (existsSync(indexFile)) {
+            const indexFile = join(resultingPath, 'index');
+            const validExt = firstValidExt(indexFile, inputExtensions);
+            if (validExt !== undefined) {
                 const joined = join(resultingPath, 'index' + outputExt);
                 const rel = cleanRelPath(relative(
                     parentDir,
@@ -181,7 +226,10 @@ export default function resolveImportPath(
         }
 
         // File import without extension
-        case existsSync(resultingPath + inputExt): {
+        default: {
+            const resultingValidExt = firstValidExt(resultingPath, inputExtensions);
+            if (resultingValidExt === undefined) break;
+
             const rel = cleanRelPath(
                 relative(parentDir, resultingPath) +
                 outputExt
@@ -189,7 +237,7 @@ export default function resolveImportPath(
 
             !isRelative && options.pathCache?.set(importPath, resultingPath + outputExt);
 
-            result.resolvedInput = resultingPath + inputExt;
+            result.resolvedInput = resultingPath + resultingValidExt;
             result.resolvedOutput = rel;
             break;
         }

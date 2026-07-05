@@ -145,6 +145,7 @@ export interface FixImportOptions {
 
     /**
      * File extension to use when searching for the import file. Defaults to the same extension as the input file.
+     * Can also be an array of file extensions to try.
      * @example
      * ```ts
      * // Use .ts when searching for files
@@ -153,7 +154,14 @@ export interface FixImportOptions {
      * }
      * ```
     */
-    inputExtension?: string|Record<string, string>;
+    inputExtension?:
+        | string
+        | Array<string>
+        | Record<
+            string,
+                | string
+                | Array<string>
+            >;
 
     /**
      * File extension to use in the output import. Defaults to '.js'.

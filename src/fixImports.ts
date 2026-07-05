@@ -27,11 +27,6 @@ export default async function fixImportsAndRequires(
     const rootDir = typeof options.rootDir === 'string'
         ? options.rootDir!
         : process.cwd();
-    
-    // File extension
-    const fileExt = extname(filePath);
-    const inputExt = options.inputExtension ?? fileExt;
-    const outputExt = options.outputExtension ?? '.js';
 
     // File contents (cast to string to prevent TypeScript errors)
     let fileContents = options.contents as string;
@@ -83,8 +78,8 @@ export default async function fixImportsAndRequires(
                 const result = resolveImportPath({
                     filePath,
                     importPath,
-                    inputExtension: inputExt,
-                    outputExtension: outputExt,
+                    inputExtension: options.inputExtension,
+                    outputExtension: options.outputExtension,
                     rootDir,
                     pathCache: options.pathCache,
                     tsConfigPaths: options.tsConfigPaths
