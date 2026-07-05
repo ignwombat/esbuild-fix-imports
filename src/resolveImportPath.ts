@@ -105,12 +105,13 @@ export default function resolveImportPath(
         }
     } else inputExtensions = [importerExt];
 
-    // Add TSX/JSX
-    if (inputExtensions.includes('.ts') && !inputExtensions.includes('.tsx'))
-        inputExtensions.push('.tsx');
-
-    if (inputExtensions.includes('.js') && !inputExtensions.includes('.jsx'))
-        inputExtensions.push('.jsx');
+    // Add TS/JS/TSX/JSX
+    if (['.ts', '.tsx', '.js', '.jsx'].includes(importerExt)) {
+        !inputExtensions.includes('.ts') && inputExtensions.push('.ts');
+        !inputExtensions.includes('.tsx') && inputExtensions.push('.tsx');
+        !inputExtensions.includes('.js') && inputExtensions.push('.js');
+        !inputExtensions.includes('.jsx') && inputExtensions.push('.jsx');
+    }
 
     const outputExt = options.outputExtension ?? '.js';
 
