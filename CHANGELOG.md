@@ -1,5 +1,11 @@
 # esbuild-fix-imports
 
+## 1.0.8
+
+### Patch Changes
+
+- 490cf57: Corrected inputExtensions for js/ts imports
+
 ## 1.0.7
 
 ### Patch Changes
